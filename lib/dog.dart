@@ -92,7 +92,7 @@ void main() async {
   // Create a Dog and add it to the dogs table
   var fido = const Dog(
     id: 0,
-    name: 'Fido',
+    name: 'Carol',
     age: 35,
   );
 
