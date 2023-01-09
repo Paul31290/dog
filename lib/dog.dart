@@ -93,7 +93,7 @@ void main() async {
   var fido = const Dog(
     id: 0,
     name: 'Fido',
-    age: 35,
+    age: 31,
   );
 
   await insertDog(fido);
