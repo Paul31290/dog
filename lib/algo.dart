@@ -2,10 +2,11 @@ import 'dart:io';
 import 'dart:math';
 
 void main () {
-  List<Activity> listActivity= [Activity(activityName: "cheval"), Activity(activityName: "course")];
+  List<Activity> listActivity= [
+    Activity(activityName: "horse"),
+    Activity(activityName: "race")];
   Set<Map<String, dynamic>> moodMap = {};
   int sorter = 0;
-  List<String> moodMessage = [];
   List<int> moodComparator = [];
   List<int> moodTracker = [];
   String? mood = "0";
@@ -15,51 +16,63 @@ void main () {
 
   List<int> comparingPreviousMoods(int){
     if(moodComparator.length >= 2) {
-      for (var i = 1; i < moodComparator.length; i++) {
-        moodDifference = moodComparator[i] - moodComparator[i-1];
+      for (var i = moodComparator.lastIndexOf(moodComparator.last)-1; i < moodComparator.lastIndexOf(moodComparator.last); i++) {
+        moodDifference = moodComparator[i+1] - moodComparator[i];
         if (moodDifference > 0) {
-          print("Amélioration");
+          print("Improvement");
           moodTracker.add(moodDifference);
         } else {
           if (moodDifference == 0) {
             print("Stabilisation");
             moodTracker.add(moodDifference);
           } else {
-            print("Dégradation");
+            print("Deterioration");
             moodTracker.add(moodDifference);
           }
         }
       }
     }
+    print(moodTracker);
     return moodTracker;
   }
-  String moodOperations(String, int){
-    if(moodTracker.length >= 3) {
+  void moodOperations(String, int){
+    if(moodComparator.length >= 7){
+      if ((moodComparator.elementAt(moodComparator.length - 6) < 2) &&
+          (moodComparator.elementAt(moodComparator.length - 5) < 2) &&
+          (moodComparator.elementAt(moodComparator.length - 4) < 2) &&
+          (moodComparator.elementAt(moodComparator.length - 3) < 2) &&
+          (moodComparator.elementAt(moodComparator.length - 2) < 2) &&
+          (moodComparator.elementAt(moodComparator.length - 1) < 2)) {
+        print(
+            "your mood wasn't very good the last 7 inputs, maybe you should go look for contacts:");
+      }
+    } else {
+    if(moodComparator.length >= 4 && moodTracker.length >=3) {
       var rng = new Random();
       sorter = rng.nextInt(listActivity.length);
-        for (var j in moodComparator) {
-          if ((moodComparator.elementAt(moodComparator.length-1) < 2) && (moodComparator.elementAt(moodComparator.length-2) < 2) &&
-              (moodComparator.elementAt(moodComparator.length-3)< 2)) {
-            message = listActivity.elementAt(sorter).getActivityName();
-            moodMessage.add(message);
+      if ((moodComparator.elementAt(moodComparator.length - 3) < 2) &&
+          (moodComparator.elementAt(moodComparator.length - 2) < 2) &&
+          (moodComparator.elementAt(moodComparator.length - 1) < 2)) {
+        message = listActivity.elementAt(sorter).getActivityName();
+        print(
+            "we saw that your mood wasn't very good in the last 3 inputs, we suggest that you do this activity: $message");
+      } else {
+        if ((moodTracker.elementAt(moodTracker.length - 3) < 0) &&
+            (moodTracker.elementAt(moodTracker.length - 2) < 0) &&
+            (moodTracker.elementAt(moodTracker.length - 1)) < 0) {
+          message = listActivity.elementAt(sorter).getActivityName();
+          print(
+              "we saw that your mood deteriorated in the last 3 inputs, we suggest that you do this activity: $message");
+              }
           }
         }
-        for (var i in moodTracker) {
-          if ((moodTracker.elementAt(moodTracker.length-1) < 0) && (moodTracker.elementAt(moodTracker.length-2)< 0) &&
-              (moodTracker.elementAt(moodTracker.length-3) < 0)) {
-
-            message = listActivity.elementAt(sorter).getActivityName();
-            moodMessage.add(message);
-          }
-        }
-      }
-    print(moodMessage);
-    return message;
+    }
   }
 
   void askingMood(int moodNumber, List<Map<String, dynamic>> moodList){
     var comparator = [];
     for(var n in moodList) {
+
       comparator.add(n.entries.first.value);
     }
     if(comparator.contains(moodNumber)){
@@ -72,16 +85,28 @@ void main () {
     moodOperations(moodTracker, moodComparator);
   }
 
-  moodMap = {const Mood(id: 0, currentMood: "Pas bien du tout").toMap(), const Mood(id: 1, currentMood: "Pas bien").toMap(), const Mood(id: 2, currentMood: "Neutre").toMap(), const Mood(id: 3, currentMood: "Bien").toMap(), const Mood(id: 4, currentMood: "Très bien").toMap()};
+  /* We create our different moods, and we are assigning a value to it: 0 is Not Good At All, 1 is Not Good etc...
+  * In future versions, we could implement more than 5 moods, we could even substitute the current system with a
+  * scroll bar for example, to make the app more precise. We decide for the MVP (Minimum Valuable Product) that a
+  * point system would be more realistic for our goals. */
+  moodMap = {
+    const Mood(id: 0, currentMood: "Not Good At All").toMap(),
+    const Mood(id: 1, currentMood: "Not Good").toMap(),
+    const Mood(id: 2, currentMood: "Neutral").toMap(),
+    const Mood(id: 3, currentMood: "Good").toMap(),
+    const Mood(id: 4, currentMood: "Very Good").toMap()};
+
+  /* We print the values of our map to the user, to let them know what to put on the screen */
   for (var n in moodMap) {
      print(n.values.toString());
   }
   while(loop) {
-    print("Entrer votre humeur:");
+    print("Please insert your mood (number between 0 and 4): ");
     mood = stdin.readLineSync();
     if (mood != null){
       if (int.tryParse(mood) != null) {
         int moodNumber = int.parse(mood);
+        print("Your current mood is: ${moodMap.elementAt(moodNumber).values.last}");
         var moodList = moodMap.toList();
         askingMood(moodNumber, moodList);
       }
@@ -89,6 +114,7 @@ void main () {
   }
 }
 
+/* Mood class, defined by its id and the current mood */
 class Mood {
   final int id;
   final String currentMood;
@@ -115,7 +141,8 @@ class Mood {
   }
 }
 
-
+/* Activity class, defined by a name. This activity will be useful after the
+ user inputs their mood, when 3 inputs in a row, their mood hasn't been well.  */
 class Activity {
   final String activityName;
 
